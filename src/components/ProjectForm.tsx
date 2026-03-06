@@ -11,7 +11,6 @@ export function ProjectForm({ onSubmit, initialData, onCancel }: ProjectFormProp
   const [nazwa, setNazwa] = useState('');
   const [opis, setOpis] = useState('');
 
-  // Wypełnij formularz danymi, jeśli jesteśmy w trybie edycji
   useEffect(() => {
     if (initialData) {
       setNazwa(initialData.nazwa);
@@ -28,7 +27,6 @@ export function ProjectForm({ onSubmit, initialData, onCancel }: ProjectFormProp
     
     onSubmit({ nazwa, opis });
     
-    // Wyczyść formularz po dodaniu (jeśli to nie była edycja)
     if (!initialData) {
       setNazwa('');
       setOpis('');
