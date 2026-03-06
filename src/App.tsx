@@ -1,14 +1,16 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { Layout } from './components/Layout';
 import { ProjectsPage } from './pages/ProjectsPage';
 
 function App() {
   return (
     <BrowserRouter>
-      <div className="min-h-screen bg-gray-100">
-        <Routes>
+      <Routes>
+        <Route element={<Layout />}>
           <Route path="/" element={<ProjectsPage />} />
-        </Routes>
-      </div>
+          
+        </Route>
+      </Routes>
     </BrowserRouter>
   );
 }
