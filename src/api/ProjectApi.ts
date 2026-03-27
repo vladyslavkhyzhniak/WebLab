@@ -1,6 +1,7 @@
 import type { Project } from '../types/Project';
 
 const STORAGE_KEY = 'projects';
+const CURRENT_PROJECT_KEY = 'currentProjectId';
 
 export const ProjectApi = {
 
@@ -9,6 +10,10 @@ export const ProjectApi = {
     return data ? JSON.parse(data) : [];
   },
 
+  async getById(id: string): Promise<Project | null> {
+    const projects = await this.getAll();
+    return projects.find(p => p.id === id) || null;
+  },
 
   async create(project: Omit<Project, 'id'>): Promise<Project> {
     const projects = await this.getAll();
@@ -41,5 +46,22 @@ export const ProjectApi = {
     const projects = await this.getAll();
     const filteredProjects = projects.filter(p => p.id !== id);
     localStorage.setItem(STORAGE_KEY, JSON.stringify(filteredProjects));
+    
+    const current = await this.getCurrent();
+    if (current === id) {
+      await this.setCurrent(null);
+    }
+  },
+
+  async setCurrent(id: string | null): Promise<void> {
+    if (id) {
+      localStorage.setItem(CURRENT_PROJECT_KEY, id);
+    } else {
+      localStorage.removeItem(CURRENT_PROJECT_KEY);
+    }
+  },
+
+  async getCurrent(): Promise<string | null> {
+    return localStorage.getItem(CURRENT_PROJECT_KEY);
   }
 };
