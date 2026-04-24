@@ -15,6 +15,9 @@ export const StoryApi = {
   getByProject: async (projectId: string): Promise<Story[]> => {
     return getStoriesFromStorage().filter(s => s.projektId === projectId);
   },
+  getById: async (id: string): Promise<Story | undefined> => {
+    return getStoriesFromStorage().find(s => s.id === id);
+  },
 
   create: async (storyData: Omit<Story, 'id' | 'dataUtworzenia'>): Promise<Story> => {
     const stories = getStoriesFromStorage();

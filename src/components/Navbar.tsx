@@ -1,12 +1,7 @@
-import type { User } from '../types/User';
+import { useAuth } from '../contexts/AuthContext';
 
 export function Navbar() {
-  const currentUser: User = {
-    id: 'user-1',
-    imie: 'test1',
-    nazwisko: 'test',
-    email: 'test@example.com'
-  };
+  const { user } = useAuth();
 
   return (
     <header className="bg-white shadow-sm px-6 py-4 mb-8">
@@ -17,7 +12,7 @@ export function Navbar() {
         <div className="text-gray-600 text-sm">
           Zalogowany jako:{' '}
           <span className="font-semibold text-gray-800">
-            {currentUser.imie} {currentUser.nazwisko}
+            {user.imie} {user.nazwisko} <span className="text-blue-500"></span>
           </span>
         </div>
       </div>

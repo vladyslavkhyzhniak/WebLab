@@ -27,8 +27,6 @@ export function ProjectView({ project }: ProjectViewProps) {
           </span>
         </div>
       </div>
-      
-      {/* Рендерим доску задач, передавая ID текущего проекта */}
       <StoryBoard projectId={project.id} />
     </div>
   );
