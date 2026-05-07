@@ -3,6 +3,7 @@ import { useCurrentProjectContext } from './contexts/CurrentProjectContext';
 import { Layout } from './components/Layout';
 import { ProjectsPage } from './pages/ProjectsPage';
 import { AuthProvider } from './contexts/AuthContext';
+import { ThemeProvider } from './contexts/ThemeContext';
 
 function AppContent() {
   const { isLoading } = useCurrentProjectContext();
@@ -20,11 +21,13 @@ function AppContent() {
 
 function App() {  
   return (
+    <ThemeProvider>
     <AuthProvider>
     <CurrentProjectProvider>
       <AppContent />
     </CurrentProjectProvider>
     </AuthProvider>
+    </ThemeProvider>
   );
 }
 

@@ -52,12 +52,11 @@ export function ProjectsPage() {
   const activeProject = projects.find(p => p.id === currentProjectId);
 
   return (
-    <div className="max-w-7xl mx-auto p-6 mt-10 flex flex-col lg:flex-row gap-8">
+    <div className="w-full px-6 sm:px-10 mt-6 sm:mt-10 flex flex-col lg:flex-row gap-8 pb-10">
       
-      {/* ЛЕВАЯ КОЛОНКА: Форма и список проектов */}
-      <div className="w-full lg:w-1/3 flex flex-col gap-8">
-        <div className="bg-white p-6 rounded-lg shadow-md">
-          <h2 className="text-xl font-semibold mb-4 text-gray-700">
+      <div className="w-full lg:w-1/3 xl:w-1/4 flex flex-col gap-8">
+        <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-md border dark:border-gray-700 transition-colors">
+          <h2 className="text-xl font-bold mb-5 text-gray-800 dark:text-gray-100">
             {editingProject ? 'Edytuj projekt' : 'Dodaj nowy projekt'}
           </h2>
           <ProjectForm 
@@ -68,15 +67,15 @@ export function ProjectsPage() {
         </div>
 
         <div>
-          <h2 className="text-2xl font-bold mb-4 text-gray-800">Twoje projekty</h2>
+          <h2 className="text-2xl font-bold mb-5 text-gray-800 dark:text-gray-100">Twoje projekty</h2>
           
           {loading ? (
-            <div className="flex justify-center p-8">
-              <p className="text-gray-500 animate-pulse">Ładowanie...</p>
+            <div className="flex justify-center p-8 bg-white dark:bg-gray-800 rounded-xl border dark:border-gray-700 shadow-sm">
+              <p className="text-gray-500 dark:text-gray-400 font-medium animate-pulse">Ładowanie projektów...</p>
             </div>
           ) : projects.length === 0 ? (
-            <div className="bg-gray-50 border-2 border-dashed border-gray-300 rounded-lg p-8 text-center text-gray-500">
-              Brak projektów
+            <div className="bg-gray-50 dark:bg-gray-800/50 border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-xl p-8 text-center text-gray-500 dark:text-gray-400 font-medium">
+              Brak projektów. Dodaj swój pierwszy!
             </div>
           ) : (
             <ul className="space-y-4">
@@ -95,17 +94,16 @@ export function ProjectsPage() {
         </div>
       </div>
 
-      {/* ПРАВАЯ КОЛОНКА: Детали проекта */}
-      <div className="w-full lg:w-2/3">
+      <div className="w-full lg:w-2/3 xl:w-3/4">
         {currentProjectId ? (
           <ProjectView project={activeProject} />
         ) : (
-          <div className="bg-white p-10 rounded-lg shadow-sm border border-gray-200 h-full flex flex-col items-center justify-center text-center">
-            <svg className="w-16 h-16 text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+          <div className="bg-white dark:bg-gray-800 p-12 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 h-full flex flex-col items-center justify-center text-center transition-colors min-h-[400px]">
+            <svg className="w-20 h-20 text-gray-300 dark:text-gray-600 mb-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
             </svg>
-            <h3 className="text-xl font-medium text-gray-600">Wybierz projekt</h3>
-            <p className="text-gray-400 mt-2">Wybierz projekt z listy po lewej stronie, aby zobaczyć jego szczegóły i historyjki.</p>
+            <h3 className="text-2xl font-bold text-gray-600 dark:text-gray-300">Brak wybranego projektu</h3>
+            <p className="text-gray-400 dark:text-gray-500 mt-3 text-lg">Wybierz projekt z listy po lewej stronie, aby zobaczyć i zarządzać jego historyjkami.</p>
           </div>
         )}
       </div>

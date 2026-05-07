@@ -21,27 +21,18 @@ export function TaskBoard({ storyId, onClose, onRefreshParent }: TaskBoardProps)
   const fetchTasks = async () => {
     const data = await TaskApi.getByStory(storyId);
     setTasks(data);
-    
     if (selectedTask) {
       const updated = data.find(t => t.id === selectedTask.id);
       setSelectedTask(updated || null);
     }
   };
 
-  useEffect(() => {
-    fetchTasks();
-  }, [storyId]);
+  useEffect(() => { fetchTasks(); }, [storyId]);
 
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!nazwa.trim()) return;
-
-    await TaskApi.create({
-      nazwa, opis, priorytet,
-      historyjkaId: storyId,
-      przewidywanyCzas: czas
-    });
-
+    await TaskApi.create({ nazwa, opis, priorytet, historyjkaId: storyId, przewidywanyCzas: czas });
     setNazwa(''); setOpis(''); setCzas(1); setPriorytet('średni');
     fetchTasks();
     onRefreshParent(); 
@@ -54,28 +45,29 @@ export function TaskBoard({ storyId, onClose, onRefreshParent }: TaskBoardProps)
 
   const renderTaskColumn = (title: string, status: TaskStatus) => {
     const colTasks = tasks.filter(t => t.stan === status);
-    
     return (
-      <div className="bg-gray-50 p-4 rounded-lg border border-gray-200 flex flex-col h-full">
-        <h4 className="font-bold text-gray-700 mb-3 border-b pb-2 flex justify-between items-center">
-          {title} <span className="bg-gray-200 text-gray-700 px-2 py-0.5 rounded text-xs">{colTasks.length}</span>
+      <div className="bg-gray-50 dark:bg-gray-800/50 p-5 rounded-xl border border-gray-200 dark:border-gray-700 flex flex-col h-full transition-colors min-w-[280px]">
+        <h4 className="font-bold text-lg text-gray-700 dark:text-gray-200 mb-4 border-b border-gray-200 dark:border-gray-700 pb-3 flex justify-between items-center">
+          {title} <span className="bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 px-3 py-1 rounded-full text-sm">{colTasks.length}</span>
         </h4>
-        <ul className="space-y-3 flex-1">
+        <ul className="space-y-4 flex-1">
           {colTasks.map(task => (
-            <li key={task.id} className="bg-white p-3 rounded border shadow-sm cursor-pointer hover:border-blue-300 transition flex flex-col h-full"
+            <li key={task.id} className="bg-white dark:bg-gray-800 p-4 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm cursor-pointer hover:border-blue-400 dark:hover:border-blue-500 transition-all hover:shadow-md flex flex-col"
                 onClick={() => setSelectedTask(task)}>
-              <div className="font-semibold text-gray-800 text-sm break-words">{task.nazwa}</div>
-              <div className="text-xs text-gray-500 mt-1 flex justify-between items-center">
-                <span>{task.przewidywanyCzas}h</span>
-                <span className={`px-1.5 py-0.5 rounded font-medium ${task.priorytet === 'wysoki' ? 'text-red-700 bg-red-50' : 'text-gray-600 bg-gray-100'}`}>
+              <div className="font-bold text-gray-800 dark:text-gray-100 text-base break-words">{task.nazwa}</div>
+              <div className="text-sm text-gray-500 dark:text-gray-400 mt-3 mb-2 flex justify-between items-center">
+                <span className="bg-gray-100 dark:bg-gray-700 px-3 py-1.5 rounded-lg font-bold border border-transparent dark:border-gray-600">{task.przewidywanyCzas}h</span>
+                <span className={`px-3 py-1.5 rounded-lg font-bold text-xs uppercase ${
+                  task.priorytet === 'wysoki' ? 'text-red-700 bg-red-100 dark:bg-red-900/30 dark:text-red-400 border border-transparent dark:border-red-900/30' : 'text-gray-700 bg-gray-100 dark:bg-gray-700 dark:text-gray-300 border border-transparent dark:border-gray-600'
+                }`}>
                   {task.priorytet}
                 </span>
               </div>
               <button 
                 onClick={(e) => { e.stopPropagation(); handleDelete(task.id); }}
-                className="text-red-500 hover:text-red-700 text-[10px] mt-3 block w-full text-right font-medium"
+                className="mt-4 w-full py-2 bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 rounded-lg text-xs font-bold hover:bg-red-100 dark:hover:bg-red-900/40 border border-transparent dark:border-red-900/30 transition-colors text-center"
               >
-                Usuń
+                Usuń zadanie
               </button>
             </li>
           ))}
@@ -84,41 +76,40 @@ export function TaskBoard({ storyId, onClose, onRefreshParent }: TaskBoardProps)
     );
   };
 
+  const inputClass = "px-4 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg text-base bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-sm";
+
   return (
-    <div className="mt-4 bg-white p-4 sm:p-6 border-2 border-blue-200 rounded-lg shadow-md relative">
-      <div className="flex justify-between items-center mb-6 gap-2">
-        <h3 className="text-xl font-bold text-blue-800">Zadania Historyjki</h3>
-        <button onClick={onClose} className="bg-gray-100 px-3 py-1.5 rounded-md text-sm font-medium hover:bg-gray-200 whitespace-nowrap">
-          Wróć
+    <div className="mt-4 bg-white dark:bg-gray-800 p-6 sm:p-8 border-2 border-blue-200 dark:border-blue-800 rounded-2xl shadow-lg relative transition-colors">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
+        <h3 className="text-2xl font-extrabold text-blue-800 dark:text-blue-400">Zadania Historyjki</h3>
+        <button onClick={onClose} className="w-full sm:w-auto bg-gray-100 dark:bg-gray-700 px-5 py-2.5 rounded-lg text-base font-bold text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors shadow-sm border border-transparent dark:border-gray-600">
+          Wróć do projektów
         </button>
       </div>
 
-      <form onSubmit={handleCreate} className="mb-6 flex flex-col sm:flex-row flex-wrap gap-3">
-        <input type="text" placeholder="Nazwa zadania" required value={nazwa} onChange={e => setNazwa(e.target.value)} className="px-3 py-2 border rounded text-sm flex-1 min-w-[140px]" />
-        <input type="text" placeholder="Opis" value={opis} onChange={e => setOpis(e.target.value)} className="px-3 py-2 border rounded text-sm flex-1 min-w-[140px]" />
-        <div className="flex gap-3 flex-1 sm:flex-none">
-          <input type="number" min="1" placeholder="Czas (h)" required value={czas} onChange={e => setCzas(Number(e.target.value))} className="px-3 py-2 border rounded text-sm w-full sm:w-24" />
-          <select value={priorytet} onChange={e => setPriorytet(e.target.value as TaskPriority)} className="px-3 py-2 border rounded text-sm bg-white w-full sm:w-auto">
+      <form onSubmit={handleCreate} className="mb-8 flex flex-col sm:flex-row flex-wrap gap-4">
+        <input type="text" placeholder="Nazwa zadania" required value={nazwa} onChange={e => setNazwa(e.target.value)} className={`flex-1 min-w-[180px] ${inputClass}`} />
+        <input type="text" placeholder="Krótki opis" value={opis} onChange={e => setOpis(e.target.value)} className={`flex-1 min-w-[180px] ${inputClass}`} />
+        <div className="flex gap-4 flex-1 sm:flex-none">
+          <label className="text-gray-700 dark:text-gray-300">Czas (h)</label>
+          <input type="number" min="1" placeholder="Czas (h)" required value={czas} onChange={e => setCzas(Number(e.target.value))} className={`w-full sm:w-28 ${inputClass}`} />
+          <select value={priorytet} onChange={e => setPriorytet(e.target.value as TaskPriority)} className={`w-full sm:w-auto ${inputClass}`}>
             <option value="niski">Niski</option>
             <option value="średni">Średni</option>
             <option value="wysoki">Wysoki</option>
           </select>
         </div>
-        <button type="submit" className="w-full sm:w-auto px-4 py-2 bg-blue-600 text-white rounded text-sm font-medium hover:bg-blue-700">Dodaj Zadanie</button>
+        <button type="submit" className="w-full sm:w-auto px-6 py-2.5 bg-blue-600 text-white rounded-lg text-base font-bold hover:bg-blue-700 transition-colors shadow-sm">Dodaj Zadanie</button>
       </form>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 items-start">
         {renderTaskColumn('Do zrobienia', 'todo')}
         {renderTaskColumn('W trakcie', 'doing')}
         {renderTaskColumn('Zrobione', 'done')}
       </div>
 
       {selectedTask && (
-        <TaskDetails 
-          task={selectedTask} 
-          onClose={() => setSelectedTask(null)} 
-          onRefresh={() => { fetchTasks(); onRefreshParent(); }} 
-        />
+        <TaskDetails task={selectedTask} onClose={() => setSelectedTask(null)} onRefresh={() => { fetchTasks(); onRefreshParent(); }} />
       )}
     </div>
   );
