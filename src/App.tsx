@@ -4,17 +4,21 @@ import { Layout } from './components/Layout';
 import { ProjectsPage } from './pages/ProjectsPage';
 import { AuthProvider } from './contexts/AuthContext';
 import { ThemeProvider } from './contexts/ThemeContext';
+import { NotificationProvider } from './contexts/NotificationContext';
+import { NotificationsPage } from './pages/NotificationPage';
+import { useState } from 'react';
 
 function AppContent() {
   const { isLoading } = useCurrentProjectContext();
+  const [currentView, setCurrentView] = useState<'projects' | 'notifications'>('projects');
 
   if (isLoading) {
-    return <div className="flex justify-center items-center h-screen">Loading...</div>;
+    return <div className="flex justify-center items-center h-screen dark:text-white">Loading...</div>;
   }
 
   return (
-    <Layout>
-      <ProjectsPage />
+    <Layout onViewChange={setCurrentView}>
+      {currentView === 'projects' ? <ProjectsPage /> : <NotificationsPage />}
     </Layout>
   );
 }
@@ -22,11 +26,13 @@ function AppContent() {
 function App() {  
   return (
     <ThemeProvider>
-    <AuthProvider>
-    <CurrentProjectProvider>
-      <AppContent />
-    </CurrentProjectProvider>
-    </AuthProvider>
+      <AuthProvider>
+        <NotificationProvider>
+          <CurrentProjectProvider>
+            <AppContent />
+          </CurrentProjectProvider>
+        </NotificationProvider>
+      </AuthProvider>
     </ThemeProvider>
   );
 }

@@ -5,12 +5,17 @@ import { ProjectForm } from '../components/ProjectForm';
 import { ProjectItem } from '../components/ProjectItem';
 import { useCurrentProjectContext } from '../contexts/CurrentProjectContext';
 import { ProjectView } from '../components/ProjectView'; 
+import { useNotification } from '../contexts/NotificationContext';
+import { useAuth } from '../contexts/AuthContext';
 
 export function ProjectsPage() {
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
   const [editingProject, setEditingProject] = useState<Project | null>(null);
   const { currentProjectId, setCurrentProject } = useCurrentProjectContext();
+  
+  const { sendNotification } = useNotification();
+  const { users } = useAuth();
 
   useEffect(() => {
     fetchProjects();
@@ -29,6 +34,16 @@ export function ProjectsPage() {
       setEditingProject(null);
     } else {
       await ProjectApi.create(data);
+      
+      const admins = users.filter(u => u.rola === 'admin');
+      admins.forEach(admin => {
+        sendNotification({
+          tytul: 'Nowy projekt',
+          tresc: `Utworzono nowy projekt o nazwie: "${data.nazwa}".`,
+          priorytet: 'wysoki', 
+          odbiorcaId: admin.id
+        });
+      });
     }
     fetchProjects();
   };

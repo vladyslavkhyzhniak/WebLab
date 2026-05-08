@@ -3,6 +3,7 @@ import type { Task } from '../types/Task';
 import { TaskApi } from '../api/TaskApi';
 import { StoryApi } from '../api/StoryApi';
 import { useAuth } from '../contexts/AuthContext';
+import { useNotification } from '../contexts/NotificationContext'; 
 
 interface TaskDetailsProps {
   task: Task;
@@ -12,9 +13,10 @@ interface TaskDetailsProps {
 
 export function TaskDetails({ task, onClose, onRefresh }: TaskDetailsProps) {
   const { users } = useAuth();
+  const { sendNotification } = useNotification(); 
   const [selectedUserId, setSelectedUserId] = useState('');
 
-  const availableWorkers = users.filter(u => u.rola === 'devops' || u.rola === 'developer');
+  const availableWorkers = users;
   const assignedUser = users.find(u => u.id === task.przypisanyUzytkownikId);
 
   const getWorkedHours = () => {
@@ -27,23 +29,50 @@ export function TaskDetails({ task, onClose, onRefresh }: TaskDetailsProps) {
   const handleAssign = async () => {
     if (!selectedUserId) return;
     await TaskApi.update(task.id, { przypisanyUzytkownikId: selectedUserId, stan: 'doing', dataStartu: new Date().toISOString() });
+    sendNotification({
+      tytul: 'Nowe zadanie!',
+      tresc: `Zostałeś przypisany do zadania: "${task.nazwa}".`,
+      priorytet: 'wysoki',
+      odbiorcaId: selectedUserId
+    });
+
     const story = await StoryApi.getById(task.historyjkaId);
-    if (story && story.stan === 'todo') {
-      await StoryApi.updateStatus(story.id, 'doing');
+    if (story) {
+      if (story.stan === 'todo') {
+        await StoryApi.updateStatus(story.id, 'doing');
+      }
+      sendNotification({
+        tytul: 'Zmiana statusu zadania',
+        tresc: `Zadanie "${task.nazwa}" przeszło w stan Doing.`,
+        priorytet: 'niski',
+        odbiorcaId: story.wlascicielId
+      });
     }
+    
     onRefresh();
   };
 
   const handleComplete = async () => {
     await TaskApi.update(task.id, { stan: 'done', dataZakonczenia: new Date().toISOString() });
+    
     const storyTasks = await TaskApi.getByStory(task.historyjkaId);
     const allDone = storyTasks.every(t => t.stan === 'done');
-    if (allDone) {
-      await StoryApi.updateStatus(task.historyjkaId, 'done');
+    
+    const story = await StoryApi.getById(task.historyjkaId);
+    if (story) {
+      if (allDone) {
+        await StoryApi.updateStatus(task.historyjkaId, 'done');
+      }
+      sendNotification({
+        tytul: 'Zadanie ukończone',
+        tresc: `Zadanie "${task.nazwa}" zostało oznaczone jako Zrobione.`,
+        priorytet: 'średni',
+        odbiorcaId: story.wlascicielId
+      });
     }
+
     onRefresh();
   };
-
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-md flex items-center justify-center z-50 p-4 transition-all">
       <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-3xl p-8 relative border dark:border-gray-700">

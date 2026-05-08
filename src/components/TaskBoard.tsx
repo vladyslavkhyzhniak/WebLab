@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react';
 import { TaskApi } from '../api/TaskApi';
 import { TaskDetails } from './TaskDetails';
 import type { Task, TaskPriority, TaskStatus } from '../types/Task';
+import { useNotification } from '../contexts/NotificationContext'; 
+import { StoryApi } from '../api/StoryApi'; 
 
 interface TaskBoardProps {
   storyId: string;
@@ -17,6 +19,8 @@ export function TaskBoard({ storyId, onClose, onRefreshParent }: TaskBoardProps)
   const [opis, setOpis] = useState('');
   const [priorytet, setPriorytet] = useState<TaskPriority>('średni');
   const [czas, setCzas] = useState(1);
+  
+  const { sendNotification } = useNotification(); 
 
   const fetchTasks = async () => {
     const data = await TaskApi.getByStory(storyId);
@@ -32,14 +36,38 @@ export function TaskBoard({ storyId, onClose, onRefreshParent }: TaskBoardProps)
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!nazwa.trim()) return;
+    
     await TaskApi.create({ nazwa, opis, priorytet, historyjkaId: storyId, przewidywanyCzas: czas });
+
+    const story = await StoryApi.getById(storyId);
+    if (story) {
+      sendNotification({
+        tytul: 'Nowe zadanie w historyjce',
+        tresc: `Utworzono nowe zadanie "${nazwa}" w Twojej historyjce.`,
+        priorytet: 'średni',
+        odbiorcaId: story.wlascicielId
+      });
+    }
+
     setNazwa(''); setOpis(''); setCzas(1); setPriorytet('średni');
     fetchTasks();
     onRefreshParent(); 
   };
 
   const handleDelete = async (id: string) => {
+    const taskToDelete = tasks.find(t => t.id === id);
     await TaskApi.delete(id);
+    if (taskToDelete) {
+      const story = await StoryApi.getById(storyId);
+      if (story) {
+        sendNotification({
+          tytul: 'Usunięto zadanie',
+          tresc: `Zadanie "${taskToDelete.nazwa}" zostało usunięte z historyjki.`,
+          priorytet: 'średni',
+          odbiorcaId: story.wlascicielId
+        });
+      }
+    }
     fetchTasks();
   };
 
