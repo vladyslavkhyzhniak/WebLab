@@ -29,13 +29,14 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
   }, [user]);
 
   const loadNotifications = async () => {
+    if (!user) return;
     const data = await NotificationApi.getByUser(user.id);
     setNotifications(data);
   };
 
   const sendNotification = async (data: Omit<Notification, 'id' | 'dataUtworzenia' | 'przeczytana'>) => {
     const newNotification = await NotificationApi.create(data);
-    
+    if (!user) return;
     if (newNotification.odbiorcaId === user.id) {
       setNotifications(prev => [newNotification, ...prev]);
 

@@ -1,9 +1,9 @@
 import { Navbar } from './Navbar';
-import {NotificationToast} from './NotificationToast';
+import { NotificationToast } from './NotificationToast';
 
 interface LayoutProps {
   children: React.ReactNode;
-  onViewChange?: (view: 'projects' | 'notifications') => void;
+  onViewChange?: (view: 'projects' | 'notifications' | 'users') => void;
 }
 
 export function Layout({ children, onViewChange }: LayoutProps) {
