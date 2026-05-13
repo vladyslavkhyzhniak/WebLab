@@ -113,7 +113,7 @@ export function StoryBoard({ projectId }: StoryBoardProps) {
             <option value="średni">Średni</option>
             <option value="wysoki">Wysoki</option>
           </select>
-          <button type="submit" className="w-full md:w-auto px-6 py-2.5 bg-blue-600 text-white font-bold rounded-lg text-base hover:bg-blue-700 transition-colors shadow-sm">
+          <button type="submit" id="add-story-btn" className="w-full md:w-auto px-6 py-2.5 bg-blue-600 text-white font-bold rounded-lg text-base hover:bg-blue-700 transition-colors shadow-sm">
             Dodaj
           </button>
         </form>

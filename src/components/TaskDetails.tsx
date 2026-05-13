@@ -115,7 +115,7 @@ export function TaskDetails({ task, onClose, onRefresh }: TaskDetailsProps) {
               </span>
             ) : (
               <div className="flex flex-col sm:flex-row gap-3">
-                <select 
+                <select id="select-pracownika"
                   className="border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 dark:text-white rounded-lg px-4 py-3 text-base w-full sm:max-w-xs focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-sm"
                   value={selectedUserId}
                   onChange={(e) => setSelectedUserId(e.target.value)}
