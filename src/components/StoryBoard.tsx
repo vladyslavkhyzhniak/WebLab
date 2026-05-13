@@ -28,7 +28,7 @@ export function StoryBoard({ projectId }: StoryBoardProps) {
 
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!nazwa.trim()) return;
+    if (!nazwa.trim() || !user) return;
     await StoryApi.create({ nazwa, opis, priorytet, stan: 'todo', projektId: projectId, wlascicielId: user.id });
     setNazwa(''); setOpis(''); setPriorytet('średni');
     fetchStories();

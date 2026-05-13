@@ -6,7 +6,7 @@ import { NotificationApi } from '../api/NotificationApi';
 
 interface AuthContextType {
   user: User | null;
-  users: User[]; 
+  users: User[];
   login: (googleData: { email: string; imie: string; nazwisko: string }) => Promise<void>;
   logout: () => void;
   updateUserRole: (userId: string, newRole: UserRole) => void;
@@ -16,11 +16,14 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<User | null>(() => {
+    const savedUser = localStorage.getItem('manageme_session');
+    return savedUser ? JSON.parse(savedUser) : null;
+  });
   const [users, setUsers] = useState<User[]>([]);
 
-  const refreshUsers = () => {
-    setUsers(UserApi.getAll());
+  const refreshUsers = async () => {
+    setUsers(await UserApi.getAll());
   };
 
   useEffect(() => {
@@ -28,12 +31,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const login = async (googleData: { email: string; imie: string; nazwisko: string }) => {
-    let existingUser = UserApi.getByEmail(googleData.email);
+    let existingUser = await UserApi.getByEmail(googleData.email);
     const superAdminEmail = import.meta.env.VITE_SUPER_ADMIN_EMAIL;
 
     if (!existingUser) {
       const isSuperAdmin = googleData.email === superAdminEmail;
-      
+
       const newUser: User = {
         id: crypto.randomUUID(),
         email: googleData.email,
@@ -43,11 +46,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         czyZablokowany: false
       };
 
-      UserApi.create(newUser);
+      await UserApi.create(newUser);
       existingUser = newUser;
 
       if (!isSuperAdmin) {
-        const admins = UserApi.getAll().filter(u => u.rola === 'admin');
+        const admins = (await UserApi.getAll()).filter(u => u.rola === 'admin');
         for (const admin of admins) {
           await NotificationApi.create({
             tytul: 'Nowe konto w systemie',
@@ -58,25 +61,26 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         }
       }
     }
-
     setUser(existingUser);
-    refreshUsers();
+    localStorage.setItem('manageme_session', JSON.stringify(existingUser)); 
+    await refreshUsers();
   };
 
   const logout = () => {
     setUser(null);
+    localStorage.removeItem('manageme_session');
   };
 
-  const updateUserRole = (userId: string, newRole: UserRole) => {
-    UserApi.update(userId, { rola: newRole });
-    refreshUsers();
+  const updateUserRole = async (userId: string, newRole: UserRole) => {
+    await UserApi.update(userId, { rola: newRole });
+    await refreshUsers();
   };
 
-  const toggleUserBlock = (userId: string) => {
+  const toggleUserBlock = async (userId: string) => {
     const u = users.find(u => u.id === userId);
     if (u) {
-      UserApi.update(userId, { czyZablokowany: !u.czyZablokowany });
-      refreshUsers();
+      await UserApi.update(userId, { czyZablokowany: !u.czyZablokowany });
+      await refreshUsers();
     }
   };
 
